@@ -1,103 +1,160 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { useLoanStore } from './_store/loanStore';
+import { useUIStore } from './_store/uiStore';
+import ControlPanel from './_components/ControlPanel';
+import MainDashboard from './_components/MainDashboard';
+import PrepaymentModal from './_components/PrepaymentModal';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { initWorker, calculate } = useLoanStore();
+  const { isMobile, setIsMobile } = useUIStore();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // 初始化
+  useEffect(() => {
+    // 初始化Web Worker
+    initWorker();
+    
+    // 执行初始计算
+    calculate();
+
+    // 检测屏幕尺寸
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, [initWorker, calculate, setIsMobile]);
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* 头部标题栏 */}
+      <motion.header 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="bg-white border-b border-gray-200 px-6 py-4"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              高精度贷款计算器
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              专业的贷款与提前还款规划工具
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-500">
+              支持等额本息 · 等额本金 · 提前还款优化
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
-}
+      </motion.header>
+
+      {/* 主体内容区域 */}
+      <div className="flex h-[calc(100vh-80px)]">
+        {/* 桌面端：三栏布局 */}
+        {!isMobile && (
+          <>
+            {/* 左侧控制面板 */}
+            <div className="w-80 flex-shrink-0">
+              <ControlPanel />
+            </div>
+
+            {/* 中间主仪表盘 - 扩展宽度 */}
+            <div className="flex-1">
+              <MainDashboard />
+            </div>
+          </>
+        )}
+
+        {/* 移动端：单栏布局 */}
+        {isMobile && (
+          <div className="flex-1 flex flex-col">
+            {/* 主仪表盘优先显示 */}
+            <div className="flex-1">
+              <MainDashboard />
+            </div>
+            
+            {/* 控制面板（可折叠） */}
+            <motion.div 
+              initial={{ y: 100 }}
+              animate={{ y: 0 }}
+              className="bg-white border-t border-gray-200 max-h-96 overflow-y-auto"
+            >
+              <div className="p-4">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
+                </div>
+                <ControlPanel />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </div>
+
+      {/* 全局样式 */}
+      <style jsx global>{`
+        /* 自定义滑块样式 */
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #3B82F6;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider::-moz-range-thumb {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #3B82F6;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider::-webkit-slider-track {
+          background: #E5E7EB;
+          border-radius: 10px;
+        }
+
+        .slider::-moz-range-track {
+          background: #E5E7EB;
+          border-radius: 10px;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: #a8a8a8;
+                 }
+       `}</style>
+
+       {/* 全局模态框 */}
+       <PrepaymentModal />
+     </div>
+   );
+ }

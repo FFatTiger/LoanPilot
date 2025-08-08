@@ -1,36 +1,148 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+> 示例网站： [calc.huu.im](https://calc.huu.im)
 
-## Getting Started
+# 高精度贷款与提前还款计算器
 
-First, run the development server:
+一款基于 React + Next.js 的专业贷款计算工具，支持等额本息、等额本金还款方式，以及智能的提前还款规划。
 
+## ✨ 主要特性
+
+### 🎯 核心功能
+- **精确计算**：支持等额本息、等额本金两种还款方式
+- **提前还款优化**：支持"缩短期限"和"减少月供"两种策略
+- **实时计算**：使用 Web Worker 确保 UI 流畅性
+- **动态反馈**：参数变化时立即更新计算结果
+
+### 💡 用户体验
+- **沉浸式引导**：即时反馈，所见即所得
+- **故事化数据**：通过动画和可视化展示节省金额
+- **响应式设计**：完美适配桌面端和移动端
+- **现代化界面**：采用 Tailwind CSS + Framer Motion
+
+### 📊 数据可视化
+- **交互式图表**：还款趋势分析和本息构成
+- **对比展示**：原始计划 vs 优化后计划
+- **动画效果**：数字滚动和图表动画
+
+## 🛠 技术架构
+
+### 前端技术栈
+- **框架**：React 18 + Next.js 15
+- **状态管理**：Zustand
+- **样式**：Tailwind CSS
+- **动画**：Framer Motion  
+- **图表**：Recharts
+- **图标**：Lucide React
+
+### 核心模块
+- **计算引擎** (`/src/app/_core/`)：纯 JavaScript 数学计算模块
+- **Web Worker** (`/src/app/_workers/`)：后台高性能计算
+- **状态管理** (`/src/app/_store/`)：Zustand 状态管理
+- **UI组件** (`/src/app/_components/`)：可复用的 React 组件
+
+## 🚀 快速开始
+
+### 安装依赖
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 启动开发服务器
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 访问应用
+打开浏览器访问 [http://localhost:3000](http://localhost:3000)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 部署到生产环境
+```bash
+# 一键部署脚本
+./deploy.sh
 
-## Learn More
+# 或手动构建
+npm run build:static
 
-To learn more about Next.js, take a look at the following resources:
+# 静态文件将生成在 out/ 目录，可直接部署到任何静态文件服务器
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+详细部署指南请参考 [DEPLOYMENT.md](./DEPLOYMENT.md)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📱 界面布局
 
-## Deploy on Vercel
+### 桌面端（三栏布局）
+- **左侧**：控制面板（贷款参数设置、提前还款计划）
+- **中间**：核心仪表盘（指标卡片、趋势图表）
+- **右侧**：深度分析区（详细数据、方案对比）
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 移动端（单栏布局）
+- **上方**：核心仪表盘优先展示
+- **下方**：可折叠的控制面板
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🧮 计算公式
+
+### 等额本息
+```
+月供 = 贷款本金 × [月利率 × (1 + 月利率)^还款月数] / [(1 + 月利率)^还款月数 - 1]
+```
+
+### 等额本金
+```
+每月还款金额 = (贷款本金 / 还款月数) + (剩余本金) × 月利率
+```
+
+### 提前还款（缩短期限）
+```
+剩余期限 = ln[月还款额 / (月还款额 - 新本金 × 月利率)] / ln(1 + 月利率)
+```
+
+## 🎨 设计理念
+
+### 三大核心原则
+1. **沉浸式引导与即时反馈**：用户输入立即产生可见反馈
+2. **故事化数据呈现**：将数字转化为直观的财务故事  
+3. **无压力探索环境**：鼓励用户尝试不同方案
+
+## 📂 项目结构
+
+```
+src/app/
+├── _components/          # UI组件
+│   ├── ControlPanel.tsx     # 控制面板
+│   ├── MainDashboard.tsx    # 核心仪表盘
+│   └── PrepaymentModal.tsx  # 提前还款模态框
+├── _core/               # 核心计算引擎
+│   ├── types.ts            # 类型定义
+│   ├── calculator.ts       # 计算逻辑
+│   └── index.ts           # 导出模块
+├── _lib/                # 工具函数
+│   └── formatters.ts      # 格式化工具
+├── _store/              # 状态管理
+│   ├── loanStore.ts       # 贷款数据状态
+│   └── uiStore.ts         # UI状态
+├── _workers/            # Web Workers
+│   └── calculator.worker.ts # 计算Worker
+└── page.tsx             # 主页面
+```
+
+## 🔧 开发计划
+
+- [x] 核心计算引擎
+- [x] Web Worker 架构
+- [x] 状态管理系统
+- [x] 控制面板 UI
+- [x] 核心仪表盘
+- [x] 响应式布局
+- [x] 深度分析面板
+- [x] 方案对比功能
+- [x] 虚拟滚动还款明细表
+- [ ] 数据导出功能
+- [ ] 组合贷款支持
+- [ ] 更多图表类型
+
+## 📄 许可证
+
+MIT License
+
+---
+
+**高精度贷款计算器** - 让贷款规划更智能、更直观！
