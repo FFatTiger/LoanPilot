@@ -1,5 +1,7 @@
 > 示例网站： [calc.huu.im](https://calc.huu.im)
 
+![Preview](pic/dashboard.png)
+
 # 高精度贷款与提前还款计算器
 
 一款基于 React + Next.js 的专业贷款计算工具，支持等额本息、等额本金还款方式，以及智能的提前还款规划。
